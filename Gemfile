@@ -38,6 +38,7 @@ group :development, :unit_tests do
   gem 'puppet-lint-version_comparison-check',              :require => false
   gem 'rspec-puppet-facts',                                :require => false
 
+<<<<<<< b781a8fc6ba1adc7296dccc37e541a0f9547e22c
   gem 'coveralls',                                         :require => false unless RUBY_VERSION =~ /^1\./
   gem 'simplecov', '~> 0.7.0',                             :require => false
   gem 'yard',                                              :require => false
@@ -53,4 +54,10 @@ group :system_tests do
   # lib/ruby/1.9.1/socket.rb:251:in `tcp': wrong number of arguments (5 for 4) (ArgumentError)
   gem 'net-ssh', '~> 2.9.0'
   gem 'simp-beaker-helpers'
+=======
+  gem 'coveralls',                                         :require => false unless RUBY_VERSION =~ /^1\.8/
+  gem 'simplecov', '~> 0.7.0',                             :require => false
+  gem 'yard',                                              :require => false
+  gem 'redcarpet', '~> 2.0',                               :require => false
+>>>>>>> Update Gemfile, remove Gemfile.lock
 end
