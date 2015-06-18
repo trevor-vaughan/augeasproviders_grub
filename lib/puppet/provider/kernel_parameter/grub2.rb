@@ -99,6 +99,9 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
 
       # Add new parameters where there are more values than existing params
       if vals && !vals.empty?
+        has_section = aug.match("$target/#{self.class.section(resource)}")
+        aug.set("$target/#{self.class.section(resource)}/quote",'"') if not has_section or has_section.empty?
+
         vals.each do |val|
           aug.set("$target/#{self.class.section(resource)}/value[last()+1]", "#{resource[:name]}=#{val}")
         end
@@ -112,7 +115,7 @@ Puppet::Type.type(:kernel_parameter).provide(:grub2, :parent => Puppet::Type.typ
       cfg = c if FileTest.file? c
     }
     fail("Cannot find grub.cfg location to use with grub-mkconfig") unless cfg
-    
+
     super
     mkconfig "-o", cfg
   end
