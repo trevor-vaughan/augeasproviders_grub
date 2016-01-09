@@ -61,3 +61,12 @@ group :system_tests do
   gem 'redcarpet', '~> 2.0',                               :require => false
 >>>>>>> Update Gemfile, remove Gemfile.lock
 end
+
+group :system_tests do
+  gem 'beaker'
+  gem 'beaker-rspec'
+  # NOTE: Workaround because net-ssh 2.10 is busting beaker
+  # lib/ruby/1.9.1/socket.rb:251:in `tcp': wrong number of arguments (5 for 4) (ArgumentError)
+  gem 'net-ssh', '~> 2.9.0'
+  gem 'simp-beaker-helpers'
+end
