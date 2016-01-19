@@ -84,33 +84,33 @@ Puppet::Type.type(:grub_menuentry).provide(:grub2) do
       elsif in_menuentry
         if line =~ /^\s*load_video\s*$/
           resource[:load_video] = true
-  
+
         elsif line =~ /^\s*insmod\s+(\S+)$/
           resource[:plugins] ||= []
-  
+
           resource[:plugins] << $1.strip
-  
+
         elsif line =~ /^\s*(?:set\s+)?root='(.+)'$/
           resource[:root] = $1.strip
-  
+
         elsif line =~ /^\s*#### PUPPET MANAGED ####\s*$/
           resource[:puppet_managed] = true
-  
+
         elsif line =~ /^\s*(?:multiboot|linux(16)?)(.+)/
           if $1 == '16'
             resource[:load_16bit] = true
           end
-          
+
           kernel_line = $2.strip.split(/\s+/)
           resource[:kernel] = kernel_line.shift
           resource[:kernel_options] = kernel_line
-  
+
         elsif line =~ /^\s*initrd(?:16)?(.+)/
           resource[:initrd] = $1.strip
 
         elsif line =~ /^\s*module\s+(.+)/
           resource[:modules] << $1.strip.split(/\s+/)
-  
+
         elsif line =~ /^\s*\}\s*$/
           in_menuentry = false
           if resource.empty?

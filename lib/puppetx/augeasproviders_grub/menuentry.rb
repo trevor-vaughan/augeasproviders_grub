@@ -6,7 +6,7 @@ module PuppetX
       # The following format is supported for the new options
       # ':defaults:'  => Copy defaults from the default GRUB entry
       # ':preserve:'  => Preserve all existing options (if present)
-      # 
+      #
       # ':defaults:' and ':preserve:' are mutually exclusive!
       #
       # All of the options below supersede any items affected by the above
@@ -105,19 +105,19 @@ module PuppetX
           if grubby_info.empty? || !grubby_info[flavor]
             raise Puppet::Error, "No default GRUB information found for `#{flavor}`"
           end
-    
+
           value = grubby_info[flavor]
-    
+
           # In some cases, /boot gets shoved on by GRUB and we can't compare againt
           # that.
           value = value.split('/')
           if value[1] == 'boot'
             value.delete_at(1)
           end
-    
+
           value = value.join('/')
         end
-    
+
         return value
       end
 
@@ -152,15 +152,15 @@ module PuppetX
       def self.munged_options(old_opts, new_opts, default_kernel, default_kernel_opts, prepend_kernel_path=false)
         # You need to prepend the kernel path for the defaults if you're trying to
         # format for `module` lines.
-    
+
         default_kernel_opts = Array(default_kernel_opts)
-  
+
         if default_kernel
           if prepend_kernel_path
             default_kernel_opts = Array(default_kernel) + default_kernel_opts
           end
         end
-          
+
         return munge_options(old_opts, new_opts, default_kernel_opts)
       end
     end

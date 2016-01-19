@@ -57,7 +57,7 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
     return @instance_array if @instance_array
 
     require 'puppetx/augeasproviders_grub/menuentry'
-      
+
     grub2_config = PuppetX::AugeasprovidersGrub::Util.grub2_cfg
 
     all_users = extract_users(grub2_config)
@@ -66,7 +66,7 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
 
     return @instance_array
   end
-  
+
   def self.prefetch(resources)
     instances.each do |prov|
       if resource = resources[prov.name]
@@ -131,13 +131,13 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
         x = x[:name]
       }
     end
-  
+
     if resource[:report_unmanaged] == :true
       self.class.report_unmanaged_users(@property_hash)
     end
 
     # Get the password into a sane format before proceeding
-  
+
     @property_hash[:ensure] == :present
   end
 
@@ -239,7 +239,7 @@ exec tail -n +3 $0
         users <<  format_user_entry(user)
       end
     end
-    
+
     output += users
 
     output = output.join("\n")
@@ -282,7 +282,7 @@ exec tail -n +3 $0
   def pack_salt(salt)
     return salt.scan(/../).map{|x| x.hex }.pack('c*')
   end
-  
+
   def unpack_salt(salt)
     return salt.unpack('H*').first.upcase
   end
@@ -291,26 +291,26 @@ exec tail -n +3 $0
     salt ||= (0...63).map{|x| x = (65 + rand(26)).chr }.join
 
     require 'openssl'
-  
+
     digest = OpenSSL::Digest::SHA512.new
-  
+
     hashed_password = OpenSSL::PKCS5.pbkdf2_hmac(password, salt, rounds, digest.digest_length, digest).unpack('H*').first.upcase
-  
+
     return "grub.pbkdf2.sha512.#{rounds}.#{unpack_salt(salt)}.#{hashed_password}"
   end
-  
+
   def validate_pbkdf2(password, pbkdf2_hash)
     if pbkdf2_hash =~ /(grub\.pbkdf2.*)/
       pbkdf2_hash = $1
     else
       raise "Error: No valid GRUB2 PBKDF2 password hash found"
     end
-  
+
     id, type, algorithm, rounds, hashed_salt, hashed_password = pbkdf2_hash.split('.')
     rounds = rounds.to_i
-  
+
     salt = pack_salt(hashed_salt)
-  
+
     return "grub.pbkdf2.sha512.#{rounds}.#{hashed_salt}.#{hashed_password}" == mkpasswd_pbkdf2(password, salt, rounds)
   end
 end
