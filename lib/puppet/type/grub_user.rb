@@ -58,6 +58,17 @@ Puppet::Type.newtype(:grub_user) do
     defaultto('/etc/grub.d/01_puppet_managed_users')
   end
 
+  newparam(:grub2_cfg, :parent => Puppet::Parameter::Path) do
+    desc <<-EOM
+      The location of the target 'grub2.cfg' file on the system.
+
+      By default, the system attempts to autodiscover the location on the
+      system.
+
+      EFI locations are searched first followed by standard grub2.cfg locations.
+    EOM
+  end
+
   newparam(:report_unmanaged, :boolean => true) do
     desc <<-EOM
       Report any unmanaged users as a warning during the Puppet run.

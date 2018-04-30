@@ -20,11 +20,11 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
 
   mk_resource_methods
 
-  def self.extract_users(content)
+  def self.extract_users(grub2_cfg_file)
     superusers = nil
     users = {}
 
-    content.each_line do |line|
+    File.read(grub2_cfg_file).each_line do |line|
       if line =~ /set\s+superusers=(?:'|")(.+?)(:?'|")/
         superusers = $1.strip.split(/\s|,|;|\||&/)
       elsif line =~ /password(?:_pbkdf2)?\s+(.*)/
@@ -58,7 +58,11 @@ Puppet::Type.type(:grub_user).provide(:grub2) do
 
     require 'puppetx/augeasproviders_grub/menuentry'
 
-    grub2_config = PuppetX::AugeasprovidersGrub::Util.grub2_cfg
+    if resource[:grub2_cfg]
+      grub2_config = resource[:grub2_cfg]
+    else
+      grub2_config = PuppetX::AugeasprovidersGrub::Util.grub2_cfg
+    end
 
     all_users = extract_users(grub2_config)
 
@@ -267,18 +271,24 @@ cat << USER_LIST
       end
     end
 
-    cfg = nil
-    [
-      "/etc/grub2-efi.cfg",
-      # Handle the standard EFI naming convention
-      "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
-      "/etc/grub2.cfg",
-      "/boot/grub/grub.cfg",
-      "/boot/grub2/grub.cfg"
-    ].each {|c|
-      cfg = c if FileTest.file? c
-    }
-    fail("Cannot find grub.cfg location to use with #{command(:mkconfig)}") unless cfg
+    if resource[:grub2_cfg]
+      cfg = resource[:grub2_cfg]
+      fail("Cannot find grub.cfg at #{cfg}") unless File.exist?(cfg)
+    else
+      cfg = nil
+      cfg = PuppetX::AugeasprovidersGrub::Util.grub2_cfg
+      [
+        "/etc/grub2-efi.cfg",
+        # Handle the standard EFI naming convention
+        "/boot/efi/EFI/#{os_name.downcase}/grub.cfg",
+        "/etc/grub2.cfg",
+        "/boot/grub/grub.cfg",
+        "/boot/grub2/grub.cfg"
+      ].each {|c|
+        cfg = c if FileTest.file? c
+      }
+      fail("Cannot find grub.cfg location to use with #{command(:mkconfig)}") unless cfg
+    end
 
     mkconfig "-o", cfg
   end
